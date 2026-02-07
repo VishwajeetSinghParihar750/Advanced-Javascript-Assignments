@@ -7,11 +7,35 @@
 // As tasks complete, queued tasks should start automatically.
 // Each task must invoke its callback with its result when finished.
 
-
 class CallbackPool {
-  constructor(limit) {}
+  constructor(limit) {
+    this.active = 0;
+    this.limit = limit;
+    this.q = [];
+  }
 
-  run(task, onComplete) {}
+  run(task, onComplete) {
+    let cb = (err, val) => {
+      if (!err) {
+        this.active--;
+        onComplete();
+
+        if (this.q.length > 0) {
+          let f = this.q.pop();
+          f();
+        }
+      }
+    };
+
+    if (this.active < this.limit) {
+      this.active++;
+      task(cb);
+    } else
+      this.q.push(() => {
+        this.active++;
+        task(cb);
+      });
+  }
 
   _next() {}
 }

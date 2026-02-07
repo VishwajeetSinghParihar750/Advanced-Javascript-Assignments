@@ -7,9 +7,18 @@
 // When the Promise resolves, the callback should be called with `(null, data)`.
 // When the Promise rejects, the callback should be called with the error.
 
-
 function callbackify(fn) {
-
+  return (...args) => {
+    let cb = args.pop();
+    fn(...args).then(
+      (val) => {
+        cb(null, val);
+      },
+      (err) => {
+        cb(err);
+      },
+    );
+  };
 }
 
 module.exports = callbackify;
