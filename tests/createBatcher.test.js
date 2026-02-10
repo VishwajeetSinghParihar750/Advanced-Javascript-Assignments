@@ -3,7 +3,7 @@ const createBatcher = require("../promises/hard/createBatcher");
 describe("createBatcher", () => {
   test("batches multiple requests into a single bulk call", async () => {
     const fetchBulk = jest.fn(async (ids) => {
-      return Object.fromEntries(ids.map(id => [id, id * 10]));
+      return Object.fromEntries(ids.map((id) => [id, id * 10]));
     });
 
     const batcher = createBatcher(fetchBulk, 50);
@@ -21,14 +21,14 @@ describe("createBatcher", () => {
 
   test("creates a new batch after delay window expires", async () => {
     const fetchBulk = jest.fn(async (ids) => {
-      return Object.fromEntries(ids.map(id => [id, id]));
+      return Object.fromEntries(ids.map((id) => [id, id]));
     });
 
     const batcher = createBatcher(fetchBulk, 30);
 
     const r1 = await batcher(1);
 
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 50));
 
     const r2 = await batcher(2);
 
@@ -68,13 +68,13 @@ describe("createBatcher", () => {
 
   test("does not mix requests across different batch windows", async () => {
     const fetchBulk = jest.fn(async (ids) => {
-      return Object.fromEntries(ids.map(id => [id, id]));
+      return Object.fromEntries(ids.map((id) => [id, id]));
     });
 
     const batcher = createBatcher(fetchBulk, 40);
 
     const p1 = batcher(1);
-    await new Promise(r => setTimeout(r, 60));
+    await new Promise((r) => setTimeout(r, 60));
     const p2 = batcher(2);
 
     await Promise.all([p1, p2]);

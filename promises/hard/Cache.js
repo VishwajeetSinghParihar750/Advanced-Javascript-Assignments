@@ -10,9 +10,25 @@
 // If a cached value is close to expiry, return the current value
 // but trigger a background refresh for future requests.
 class Cache {
-  constructor(ttl) {}
+  constructor(ttl) {
+    this.ttl = ttl;
+    this.cache = {};
+  }
 
-  get(key, fetcher) {}
+  get(key, fetcher) {
+    if (
+      !Object.keys(this.cache).find((k) => {
+        return k == key;
+      })
+    ) {
+      this.cache[key] = fetcher();
+      setTimeout(() => {
+        delete this.cache[key];
+      }, this.ttl);
+    }
+
+    return this.cache[key];
+  }
 }
 
 module.exports = Cache;
